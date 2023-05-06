@@ -30,8 +30,11 @@ The TX output can be any Arduino pin, but the LocoNet library defaults to digita
 LNCV programming gives some options
 LNCV[0] : default lncv module address 0
 LNCV[1] : Article number
-LNCV[2] : Start Address on which to respond to
+LNCV[2] : Start Address on which to respond to (Loconet Sensor HIGH)
 LNCV[3] : Onumber of tracks to distinguish (LNCV(2) + LNCV(3) -1 = max address to process
+
+
+The DFPlayer uses track numbers based on the ORDER in which files are LOADED on the SD card, no file number schemes or names do the trick!
 
 /************************************************************************************************************/
 #include <LocoNet.h>
@@ -81,6 +84,29 @@ LocoNetCVClass lnCV;
 boolean modeProgramming = false;
 
 #include "lncv.h"
+
+void readVolume() {
+  //read in volume poti and set DFPlayer volume
+  sensorValue = analogRead(volume_PIN);
+  if (!(volumeValue == map(sensorValue, 0, 1023, 0, 30))) { //only on change
+    volumeValue = map(sensorValue, 0, 1023, 0, 30);
+    //DEBUG_PRINT("Snd: volume: ");
+    //DEBUG_PRINTLN(volumeValue);
+    myDFPlayer.volume(volumeValue);  //Set volume value. From 0 to 30
+  }
+}
+
+void playSound() {
+  //check to play wecker sound
+  if (track > 0) {
+    //start sound
+      Serial.print(F(", "));
+      Serial.println(track);
+      myDFPlayer.loop(track);
+      //myDFPlayer.startRepeatPlay();    
+  }
+}
+
 /*************************************************************************/
 /*          Setup                                                        */
 /*************************************************************************/ 
@@ -102,10 +128,7 @@ void setup() {
   }
  
   //read in volume poti and set DFPlayer volume
-  sensorValue = analogRead(volume_PIN);
-  volumeValue = map(sensorValue, 0, 1023, 0, 30); // Map analog input to volume of DFPlayer
-
-  myDFPlayer.volume(volumeValue);  //Set volume value. From 0 to 30
+  readVolume();
   
   /*
    * load settings from eeprom
@@ -117,19 +140,8 @@ void setup() {
   myDFPlayer.stop();
 } 
 
-/*************************************************************************/
-/*          Program Loop                                                 */
-/*************************************************************************/ 
-void loop() {
-//read in volume poti and set DFPlayer volume
-  sensorValue = analogRead(volume_PIN);
-  if (!(volumeValue == map(sensorValue, 0, 1023, 0, 30))) { //only on change
-    volumeValue = map(sensorValue, 0, 1023, 0, 30);
-    //DEBUG_PRINT("Snd: volume: ");
-    //DEBUG_PRINTLN(volumeValue);
-    myDFPlayer.volume(volumeValue);  //Set volume value. From 0 to 30
-  }
-  //receive LnPacket
+void checkLoconet() {
+   //receive LnPacket
   LnPacket = LocoNet.receive() ; // Check for any received Loconet packets
 
    // process events
@@ -140,15 +152,16 @@ void loop() {
       packetConsumed = lnCV.processLNCVMessage(LnPacket);
     }
   }  
+}
+/*************************************************************************/
+/*          Program Loop                                                 */
+/*************************************************************************/ 
+void loop() {
+  readVolume();
+
+  checkLoconet();
  
-  //check to ring wecker
-  if (track > 0) {
-    //start sound
-      Serial.print(F(", "));
-      Serial.println(track);
-      myDFPlayer.loop(track);
-      //myDFPlayer.startRepeatPlay();    
-  }
+  playSound();
 }
 
 void notifySensor( uint16_t Address, uint8_t State )
