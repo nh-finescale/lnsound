@@ -1,3 +1,3 @@
 # lnsound
 
-Arduino skecth to play DFPlayer sounds based on Loconet Message
+Arduino sketch to play DFPlayer sounds based on Loconet Message
