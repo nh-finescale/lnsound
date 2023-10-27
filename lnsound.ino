@@ -40,8 +40,8 @@ The DFPlayer uses track numbers based on the ORDER in which files are LOADED on 
 #include <LocoNet.h>
 #include <EEPROM.h>
 
-// DFPlayer mini fast
-#include <DFPlayerMini_Fast.h>
+// DFPlayer mini 
+#include <DFPlayerMini.h>
 #include <SoftwareSerial.h>
 
 //Verbindungspins zum DFPlayer mini
@@ -56,13 +56,14 @@ SoftwareSerial mySoftwareSerial(DFPlayer_RX, DFPlayer_TX); // RX, TX
 #define Console Serial           // command processor input/output stream
 
 //DFRobotDFPlayerMini myDFPlayer;
-DFPlayerMini_Fast myDFPlayer;
+//DFPlayerMini_Fast myDFPlayer;
+DFPlayerMini myDFPlayer;
 
 bool bUseCallback = false; // use callbacks?
 bool bUseSynch = false;   // use synchronous? 
 
 // uncomment this to debug
-#define DEBUG
+//#define DEBUG
 
 #define VERSION 1
 #define ARTNR 1531
@@ -92,7 +93,7 @@ void readVolume() {
     volumeValue = map(sensorValue, 0, 1023, 0, 30);
     //DEBUG_PRINT("Snd: volume: ");
     //DEBUG_PRINTLN(volumeValue);
-    myDFPlayer.volume(volumeValue);  //Set volume value. From 0 to 30
+    myDFPlayer.setVolume(volumeValue);  //Set volume value. From 0 to 30
   }
 }
 
@@ -100,9 +101,11 @@ void playSound(int t) {
   //check to play wecker sound
   if (t > 0) {
     //start sound
-      Serial.print(F(", "));
+      Serial.print(F("playing : "));
       Serial.println(t);
-      myDFPlayer.loop(t);
+      //myDFPlayer.stop();
+      myDFPlayer.playFile(t);
+            Serial.println("done");
       //myDFPlayer.startRepeatPlay();    
   }
 }
@@ -114,30 +117,28 @@ void playSound(int t) {
 void setup() {
 
   #ifdef DEBUG
+    Serial.begin(57600);  
     Serial.print(" setup... ");
+
   #endif
   // Initialize Loconet Interface
   LocoNet.init(LOCONET_TX_PIN);
  
  // Verbindung zum DFPlayer mini
   mySoftwareSerial.begin(9600);
-  if (!myDFPlayer.begin(mySoftwareSerial)) {  //Use softwareSerial to communicate with DFPlayer
-   while(true){
-      delay(0); // Code to be compatible with ESP8266 watch dog.
-    }
-  }
- 
-  //read in volume poti and set DFPlayer volume
+  myDFPlayer.init(A4, DFPlayer_RX, DFPlayer_TX);// {  //Use softwareSerial to communicate with DFPlayer
+   //read in volume poti and set DFPlayer volume
   readVolume();
   
   /*
    * load settings from eeprom
    */
+  //resetSettings();
   loadSettings();
   lnaddr = lncv[2];
   numTracks = lncv[3];
 
-  myDFPlayer.stop();
+  //myDFPlayer.stop();
   playSound(1); 
 } 
 
@@ -159,9 +160,9 @@ void checkLoconet() {
 /*************************************************************************/ 
 void loop() {
   readVolume();
-
+  track = 0;
   checkLoconet();
- 
+
   playSound(track);
 }
 
@@ -169,7 +170,9 @@ void notifySensor( uint16_t Address, uint8_t State )
 {
   if ((Address>=lnaddr) & (Address <= (lnaddr+numTracks -1))) {
     if (State==0x10) {
-        track = Address-lnaddr; //calculate index of MP3 file (from 1)
+        Serial.print(" found... ");     
+        track = Address-lnaddr+1; //calculate index of MP3 file (from 1)
+              Serial.println(track);
       }
       else if (State==0x00) {
         track = 0;
