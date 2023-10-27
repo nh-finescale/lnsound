@@ -20,11 +20,17 @@ void resetSettings()
   Serial.print("RESET MODULE CONFIGURATION");
   #endif
 
-  lncv[0] = 0;
-  lncv[1] = 1531;  // LN address for wecker #1
-  lncv[2] = 1;    // start (sensor) address
-  lncv[3] = 4;  // No of mp3 sounds
-  
+  lncv[0] = 1;      //LN address board
+  lncv[1] = 1531;   // ARTNR for LNCV programming
+  lncv[2] = 1;      // LN address for wecker #1 (sensor high)
+  lncv[3] = 4;      // No of mp3 sounds
+  lncv[4] = 0;  
+  lncv[5] = 0;  
+  lncv[6] = 0;  
+  lncv[7] = 0;  
+  lncv[8] = 0;  
+   
+
   saveSettings();
 }
 
@@ -57,7 +63,7 @@ void commitLNCVUpdate() {
   saveSettings();
 }
 
-int8_t notifyLNCVread(uint16_t ArtNr, uint16_t lncvAddress, uint16_t, uint16_t & lncvValue)
+int8_t notifyLNCVread(uint16_t ArtNr, uint16_t lncvAddress, uint16_t & lncvValue)
 {
   #ifdef DEBUG
     Serial.print("READ LNCV (");

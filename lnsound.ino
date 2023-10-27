@@ -62,11 +62,11 @@ bool bUseCallback = false; // use callbacks?
 bool bUseSynch = false;   // use synchronous? 
 
 // uncomment this to debug
-//#define DEBUG
+#define DEBUG
 
 #define VERSION 1
 #define ARTNR 1531
-#define LNCV_COUNT 4
+#define LNCV_COUNT 9
 
 // Loconet
 #define LOCONET_TX_PIN 7
@@ -96,13 +96,13 @@ void readVolume() {
   }
 }
 
-void playSound() {
+void playSound(int t) {
   //check to play wecker sound
-  if (track > 0) {
+  if (t > 0) {
     //start sound
       Serial.print(F(", "));
-      Serial.println(track);
-      myDFPlayer.loop(track);
+      Serial.println(t);
+      myDFPlayer.loop(t);
       //myDFPlayer.startRepeatPlay();    
   }
 }
@@ -123,7 +123,7 @@ void setup() {
   mySoftwareSerial.begin(9600);
   if (!myDFPlayer.begin(mySoftwareSerial)) {  //Use softwareSerial to communicate with DFPlayer
    while(true){
-      delay(0); // Code to compatible with ESP8266 watch dog.
+      delay(0); // Code to be compatible with ESP8266 watch dog.
     }
   }
  
@@ -138,6 +138,7 @@ void setup() {
   numTracks = lncv[3];
 
   myDFPlayer.stop();
+  playSound(1); 
 } 
 
 void checkLoconet() {
@@ -161,7 +162,7 @@ void loop() {
 
   checkLoconet();
  
-  playSound();
+  playSound(track);
 }
 
 void notifySensor( uint16_t Address, uint8_t State )
