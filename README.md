@@ -14,3 +14,5 @@ Programming is through lncv, lncv's are:
 |2  |1 |LN address of first sound, Loconet sensor message|
 |3 |4 | # of files to play|
 |4-8| 0 | empty, not used |
+
+A parts list with Reichelt part numbers is included: https://github.com/nh-finescale/lnsound/blob/main/partslist.txt
