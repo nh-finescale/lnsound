@@ -9,5 +9,5 @@ Programming is through lncv, lncv's are:
 |:-:|:-:|:--|
 |0 |0|not used|
 |1  |1531 |article number for LNCV programming|
-|2  |1 |LN address of first sound, sensor type|
+|2  |1 |LN address of first sound, Loconet sensor message|
 |3 |4 | # of files to play|
