@@ -36,6 +36,7 @@ LNCV 4-8 are empty to conofm to article 1531 lncv range
 
 
 The DFPlayer uses track numbers based on the ORDER in which files are LOADED on the SD card, no file number schemes or names do the trick!
+Library for the DFPLayer is: https://github.com/jonnieZG/DFPlayerMini
 
 /************************************************************************************************************/
 #include <LocoNet.h>
