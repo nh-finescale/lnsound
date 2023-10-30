@@ -32,6 +32,7 @@ LNCV[0] : default lncv module address 0
 LNCV[1] : Article number
 LNCV[2] : Start Address on which to respond to (Loconet Sensor HIGH)
 LNCV[3] : Onumber of tracks to distinguish (LNCV(2) + LNCV(3) -1 = max address to process
+LNCV 4-8 are empty to conofm to article 1531 lncv range 
 
 
 The DFPlayer uses track numbers based on the ORDER in which files are LOADED on the SD card, no file number schemes or names do the trick!
